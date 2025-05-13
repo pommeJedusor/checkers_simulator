@@ -1,61 +1,9 @@
 import random
 
-EMPTY       = 0
-WHITE       = 1
-BLACK       = 2
-MAN         = 4
-KING        = 8
-FLYING_KING = 16
-
-class Position:
-    def __init__(self, x: int, y: int) -> None:
-        self.x = x
-        self.y = y
-
-    def is_valid_position(self, width: int, height: int) -> bool:
-        return 0 <= self.x < width and 0 <= self.y < height
-
-class Move:
-    def __init__(self, origin: Position, dest: Position, takes: list[Position], taken_pieces: list[int]):
-        self.origin = origin
-        self.dest = dest
-        self.takes = takes
-        self.taken_pieces = taken_pieces
-
-class Settings:
-    def __init__(self, width: int, height: int, nb_pieces_row_by_side: int, is_white_starting: bool, is_bottom_right_light: bool, must_take: bool, must_take_longest_sequence: bool, passing_promotion: bool, backward_capture: bool, orthogonal_captures: bool):
-        self.width = width
-        self.height = height
-        self.nb_pieces_row_by_side = nb_pieces_row_by_side
-        self.is_white_starting = is_white_starting
-        self.is_bottom_right_light = is_bottom_right_light
-        self.must_take = must_take
-        self.must_take_longest_sequence = must_take_longest_sequence
-        self.passing_promotion = passing_promotion
-        self.backward_capture = backward_capture
-        self.orthogonal_captures = orthogonal_captures
-        self.board = []
-
-    def generate_board(self) -> list[list[int]]:
-        # empty board
-        self.board = [[EMPTY for _ in range(self.width)] for _ in range(self.height)]
-        # white pieces
-        for y in range(self.nb_pieces_row_by_side):
-            self.board[y] = []
-            for x in range(self.width):
-                if x % 2 == y % 2:
-                    self.board[y].append(EMPTY)
-                else:
-                    self.board[y].append(MAN | WHITE)
-        # black pieces
-        for y in range(self.height - self.nb_pieces_row_by_side, self.height):
-            self.board[y] = []
-            for x in range(self.width):
-                if x % 2 == y % 2:
-                    self.board[y].append(EMPTY)
-                else:
-                    self.board[y].append(MAN | BLACK)
-        return self.board
+from consts import *
+from Position import Position
+from Settings import Settings
+from Move import Move
 
 class Checkers:
     def __init__(self, settings: Settings):
