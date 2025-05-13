@@ -121,7 +121,7 @@ class Checkers:
             take.takes.append(next_take.takes[0])
 
             dest, take.dest = take.dest, next_take.dest
-            sequences, destinations = self.explore_take(take, longest_sequences, taker)
+            sequences, destinations = self.explore_take(take, longest_sequences, taker, longest_destinations)
             take.dest, dest = dest, take.dest
 
             for i, sequence in enumerate(sequences):
@@ -143,7 +143,7 @@ class Checkers:
 
         if must_put_back_taker:
             self.settings.board[take.origin.y][take.origin.x] = taker
-        return (longest_sequences or [], longest_destinations)
+        return ([sequence for sequence in longest_sequences] or [], longest_destinations)
 
     def get_all_moves(self) -> list[Move]:
         single_takes = self.get_single_takes()
