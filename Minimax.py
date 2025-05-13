@@ -4,7 +4,7 @@ from Position import Position
 from Settings import Settings
 from Move import Move
 
-DEPTH_MAX = 4
+DEPTH_MAX = 1
 
 def get_board_eval(game: Checkers) -> int:
     score = 0
@@ -39,7 +39,15 @@ def main():
     checkers.make_move(Move(Position(0, 3), Position(1, 4), [], []))
     checkers.make_move(Move(Position(5, 6), Position(4, 5), [], []))
     checkers.make_move(Move(Position(1, 2), Position(0, 3), [], []))
-    checkers.make_move(Move(Position(7, 5), Position(6, 4), [], []))
+    checkers.make_move(Move(Position(7, 6), Position(6, 5), [], []))
+    checkers.make_move(Move(Position(0, 1), Position(1, 2), [], []))
+    checkers.make_move(Move(Position(1, 6), Position(2, 5), [], []))
+    checkers.make_move(Move(Position(1, 0), Position(0, 1), [], []))
+    checkers.make_move(Move(Position(9, 6), Position(8, 5), [], []))
+    checkers.make_move(Move(Position(6, 3), Position(5, 4), [], []))
+    checkers.make_move(Move(Position(4, 5), Position(6, 3), [Position(5, 4)], []))
+    for row in checkers.settings.board:
+        print(row)
     move, score = minimax(checkers)
     print(f"move: ({move.origin.x}, {move.origin.y}), ({move.dest.x}, {move.dest.y})")
     print(score)
