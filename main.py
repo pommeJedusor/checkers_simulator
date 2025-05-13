@@ -16,10 +16,11 @@ class Position:
         return 0 <= self.x < width and 0 <= self.y < height
 
 class Move:
-    def __init__(self, origin: Position, dest: Position, takes: list[Position]):
+    def __init__(self, origin: Position, dest: Position, takes: list[Position], taken_pieces: list[int]):
         self.origin = origin
         self.dest = dest
         self.takes = takes
+        self.taken_pieces = taken_pieces
 
 class Settings:
     def __init__(self, width: int, height: int, nb_pieces_row_by_side: int, is_white_starting: bool, is_bottom_right_light: bool, must_take: bool, must_take_longest_sequence: bool, passing_promotion: bool, backward_capture: bool, orthogonal_captures: bool):
@@ -115,7 +116,7 @@ class Checkers:
                 if self.settings.board[move[1].y][move[1].x] != EMPTY:
                     continue
                 if self.settings.board[move[0].y][move[0].x] & 0b11 == self.current_player ^ 0b11:
-                    final_moves.append(Move(piece, move[1], [move[0]]))
+                    final_moves.append(Move(piece, move[1], [move[0]], [self.settings.board[move[0].y][move[0].x]]))
 
         return final_moves
 
@@ -148,7 +149,7 @@ class Checkers:
                     continue
                 if self.settings.board[move.y][move.x] != EMPTY:
                     continue
-                final_moves.append(Move(piece, move, []))
+                final_moves.append(Move(piece, move, [], []))
 
         return final_moves
 
@@ -207,7 +208,12 @@ class Checkers:
             for i in range(len(sequences)):
                 sequence = sequences[i]
                 destination = destinations[i]
-                move = Move(take.origin, destination, sequence)
+
+                taken_pieces = []
+                for take_pos in sequence:
+                    taken_pieces.append(self.settings.board[take_pos.y][take_pos.x])
+
+                move = Move(take.origin, destination, sequence, taken_pieces)
                 moves.append(move)
 
         return moves or single_takes
@@ -220,16 +226,16 @@ class Checkers:
 
     def cancel_move(self, move: Move):
         self.settings.board[move.origin.y][move.origin.x], self.settings.board[move.dest.y][move.dest.x] = self.settings.board[move.dest.y][move.dest.x], self.settings.board[move.origin.y][move.origin.x]
-        for take in move.takes:
-            self.settings.board[take.y][take.x] = EMPTY
+        for i, take in enumerate(move.takes):
+            self.settings.board[take.y][take.x] = move.taken_pieces[i]
         self.current_player ^= 0b11
 
 def main():
     settings = Settings(10, 10, 4, True, True, True, True, False, True, False)
     settings.generate_board()
     checkers = Checkers(settings)
-    checkers.make_move(Move(Position(0, 3), Position(2, 5), []))
-    checkers.make_move(Move(Position(4, 7), Position(7, 4), []))
+    checkers.make_move(Move(Position(0, 3), Position(2, 5), [], []))
+    checkers.make_move(Move(Position(4, 7), Position(7, 4), [], []))
     
     while True:
         for row in checkers.settings.board:
@@ -245,8 +251,12 @@ def main():
             print("no more move available")
             exit(0)
         print(f"next_move: ({next_move.origin.x}, {next_move.origin.y}), ({next_move.dest.x}, {next_move.dest.y})")
+        print(f"{next_move.taken_pieces}")
+        for take in next_move.takes:
+            print(f"{take.x}, {take.y}")
         input()
         checkers.make_move(next_move)
+        checkers.cancel_move(next_move)
 
 if __name__ == "__main__":
     main()
